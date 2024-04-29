@@ -1,0 +1,300 @@
+CREATE TABLE AllData (
+PatientName VARCHAR(100),
+Age INT,
+Gender VARCHAR(10),
+[BloodType] VARCHAR(3),
+[MedicalCondition] VARCHAR(100),
+[DoctorName] VARCHAR(100),
+Hospital VARCHAR(100),
+Insurance VARCHAR(100),
+[BillingAmount] NUMERICAL,
+[RoomNumber] INT,
+[PatientID] INT,
+[ConditionID] INT,
+Description TEXT,
+[AdmissionID] INT,
+[DateOfAdmission] DATE,
+[DoctorID] INT,
+[HospitalID] INT,
+Specialization VARCHAR(100),
+[OfficeHours] VARCHAR(100),
+[FieldOfSpecialization] VARCHAR(100),
+[ConsultationFee] INT,
+Location VARCHAR(100),
+[InsuranceID] INT,
+[CoverageDescription] TEXT,
+[BillID] INT,
+[PaymentStatus] VARCHAR(100)
+);
+
+--import entire excel dataset. Select specific columns from dataset to create tables
+
+-- creating the tables
+CREATE TABLE Patients (PatientID INT PRIMARY KEY, PatientName VARCHAR(100), Age INT, Gender VARCHAR(10), BloodType VARCHAR(3));
+
+INSERT INTO Patients (PatientID, PatientName, Age, Gender, BloodType)
+SELECT DISTINCT PatientID, PatientName, Age, Gender, BloodType
+FROM AllData;
+
+-- Base Doctors table
+CREATE TABLE Doctors (
+DoctorID INT PRIMARY KEY,
+DoctorName VARCHAR(100),
+Specialization VARCHAR(100)
+);
+
+INSERT INTO Doctors (DoctorID, DoctorName, Specialization)
+SELECT DISTINCT DoctorID, DoctorName, Specialization
+FROM AllData;
+
+-- General Practitioners table
+CREATE TABLE GeneralPractitioners (
+DoctorID INT PRIMARY KEY,
+OfficeHours VARCHAR(50),
+FOREIGN KEY (DoctorID) REFERENCES Doctors(DoctorID)
+);
+
+INSERT INTO GeneralPractitioners (DoctorID, OfficeHours)
+SELECT DISTINCT DoctorID, OfficeHours
+FROM AllData
+WHERE AllData.Specialization = "general";
+
+-- Specialists table
+CREATE TABLE Specialists (
+DoctorID INT PRIMARY KEY,
+FieldOfSpecialization VARCHAR(100),
+ConsultationFee DECIMAL(10, 2),
+FOREIGN KEY (DoctorID) REFERENCES Doctors(DoctorID)
+);
+
+INSERT INTO Specialists (DoctorID, FieldofSpecialization, ConsultationFee)
+SELECT DISTINCT DoctorID, FieldofSpecialization, ConsultationFee
+FROM AllData
+WHERE AllData.Specialization <> "general";
+
+-- Hospitals Table
+CREATE TABLE Hospitals (
+HospitalID INT PRIMARY KEY,
+Hospital VARCHAR(100),
+Location VARCHAR(100)
+);
+
+INSERT INTO Hospitals (HospitalID, Hospital, Location)
+SELECT DISTINCT HospitalID, Hospital, Location
+FROM AllData;
+
+-- Admissions Table
+CREATE TABLE Admissions (
+AdmissionID INT PRIMARY KEY,
+PatientID INT,
+DateOfAdmission DATE,
+DoctorID INT,
+HospitalID INT,
+FOREIGN KEY (PatientID) REFERENCES Patients(PatientID),
+FOREIGN KEY (DoctorID) REFERENCES Doctors(DoctorID),
+FOREIGN KEY (HospitalID) REFERENCES Hospitals(HospitalID)
+);
+
+INSERT INTO Admissions (AdmissionID, PatientID, DateOfAdmission, DoctorID, HospitalID)
+SELECT DISTINCT AdmissionID, PatientID, DateOfAdmission, DoctorID, HospitalID
+FROM AllData;
+
+-- Medical Conditions Table
+CREATE TABLE Medical_Conditions (
+ConditionID INT PRIMARY KEY,
+Description VARCHAR(255)
+);
+
+INSERT INTO Medical_Conditions (ConditionID, Description)
+SELECT DISTINCT ConditionID, Description
+FROM AllData;
+
+-- Patient Conditions Table (Many-to-Many Relationship)
+CREATE TABLE Patient_Conditions (
+PatientID INT,
+ConditionID INT,
+PRIMARY KEY (PatientID, ConditionID),
+FOREIGN KEY (PatientID) REFERENCES Patients(PatientID),
+FOREIGN KEY (ConditionID) REFERENCES Medical_Conditions(ConditionID)
+);
+
+INSERT INTO Patient_Conditions (PatientID, ConditionID)
+SELECT DISTINCT PatientID, ConditionID
+FROM AllData;
+
+-- Insurance Table
+CREATE TABLE Insurance (
+InsuranceID INT PRIMARY KEY,
+Insurance VARCHAR(100),
+CoverageDescription TEXT
+);
+
+INSERT INTO Insurance (InsuranceID, Insurance, CoverageDescription)
+SELECT DISTINCT InsuranceID, Insurance, CoverageDescription
+FROM AllData;
+
+-- Billing Table
+CREATE TABLE Billing (
+BillID INT PRIMARY KEY,
+AdmissionID INT,
+InsuranceID INT,
+BillingAmount DECIMAL(10, 2),
+PaymentStatus VARCHAR(50),
+FOREIGN KEY (AdmissionID) REFERENCES Admissions(AdmissionID),
+FOREIGN KEY (InsuranceID) REFERENCES Insurance(InsuranceID)
+);
+
+INSERT INTO Billing (BillID, AdmissionID, InsuranceID, BillingAmount, PaymentStatus)
+SELECT DISTINCT BillID, AdmissionID, InsuranceID, BillingAmount, PaymentStatus
+FROM AllData;
+
+-- Insert sample data into the Doctors table
+INSERT INTO Doctors (DoctorID, DoctorName, Specialization) 
+VALUES (21, 'Patrick Parker', 'general');
+
+INSERT INTO Doctors (DoctorID, DoctorName, Specialization)
+VALUES (22, 'Bill Fox', 'hypogonadism');
+
+-- Insert sample data into the GeneralPractitioners table
+INSERT INTO GeneralPractitioners (DoctorID, OfficeHours) VALUES
+(21, '09:00-17:00');
+
+-- Insert sample data into the Specialists table
+INSERT INTO Specialists (DoctorID, FieldOfSpecialization, ConsultationFee) VALUES
+(22, 'Endocrinologist', 150.00);
+
+-- Insert sample data into the Patients table
+INSERT INTO Patients (PatientID, PatientName, Age, Gender, BloodType) VALUES
+(53, 'Tiffany Rodrigo', 28, 'Female', 'O-');
+
+-- Insert sample data into the Hospitals table
+INSERT INTO Hospitals (HospitalID, Hospital, Location) VALUES
+(21, 'Saint Agnes', 'Fresno, CA');
+
+-- Insert sample data into the Admissions table
+INSERT INTO Admissions (AdmissionID, PatientID, DateOfAdmission, DoctorID, HospitalID) VALUES
+(401, 53, '2022-11-17', 21, 21);
+
+-- Insert sample data into the Medical Conditions table
+INSERT INTO Medical_Conditions (ConditionID, Description) VALUES
+(7, 'concussion');
+
+-- Insert sample data into the Patient_Conditions table
+INSERT INTO Patient_Conditions (PatientID, ConditionID) VALUES
+(53, 7);
+
+-- Insert sample data into the Insurance table
+INSERT INTO Insurance (InsuranceID, Insurance, CoverageDescription) VALUES
+(6, 'Kaiser', 'Partial Coverage');
+
+-- Insert sample data into the Billing table
+INSERT INTO Billing (BillID, AdmissionID, InsuranceID, BillingAmount, PaymentStatus) VALUES
+(5112, 401, 6, 37490.98336352819, 'Pending');
+
+--
+--
+--
+--subqueries
+SELECT d.DoctorID, d.DoctorName, COUNT(a.AdmissionID) AS PatientCount
+From Doctors d
+Join Admissions a ON d.DoctorID = a.DoctorID
+GROUP BY d.DoctorID, d.DoctorName
+HAVING COUNT(a.AdmissionID) > (
+SELECT AVG(PatientCount) FROM (
+SELECT COUNT(a.AdmissionID) AS PatientCount
+From Admissions a
+GROUP BY a.DoctorID
+) AS AvgPatients
+);
+
+SELECT p.PatientName
+FROM Patients p
+WHERE EXISTS (
+SELECT 1
+FROM Admissions a
+JOIN Specialists s ON a.DoctorID = s.DoctorID
+WHERE p.PatientID = a.PatientID
+AND a.HospitalID = (SELECT HospitalID FROM Hospitals WHERE Hospital = "Clovis Community")
+AND s.FieldOfSpecialization = "psychiatry"
+);
+
+--aggregation
+SELECT h.HospitalID, h.Hospital, SUM(b.BillingAmount) AS TotalBilling, AVG(p.Age) AS AverageAge
+FROM Hospitals h
+JOIN Admissions a ON h.HospitalID = a.HospitalID
+JOIN Patients p ON a.PatientID = p.PatientID
+JOIN Billing b ON a.AdmissionID = b.AdmissionID
+GROUP BY h.HospitalID, h.Hospital;
+
+SELECT i.Insurance, AVG(b.BillingAmount) AS AverageBilling
+FROM Insurance i
+JOIN Billing b ON i.InsuranceID = b.InsuranceID
+GROUP BY i.Insurance;
+
+-- insertions
+INSERT INTO Medical_Conditions (ConditionID, Description) VALUES
+(8, 'depression');
+
+INSERT INTO Hospitals (HospitalID, Hospital, Location) VALUES
+(22, 'Clovis Community', 'Clovis, CA');
+
+INSERT INTO Doctors (DoctorID, DoctorName, Specialization)
+VALUES (23, 'Joe Dirt', 'psychiatry');
+
+INSERT INTO Specialists (DoctorID, FieldOfSpecialization, ConsultationFee) VALUES
+(23, 'Psychiatry', 220.00);
+
+INSERT INTO Insurance (InsuranceID, Insurance, CoverageDescription) VALUES
+(7, 'Humana', 'Partial Coverage');
+
+INSERT INTO Patients (PatientID, PatientName, Age, Gender, BloodType)
+VALUES (123, "Ally Smith", 30, "Female", "O-");
+
+INSERT INTO Admissions (AdmissionID, PatientID, DateOfAdmission, DoctorID, HospitalID) VALUES
+(402, 123, '2022-11-17', 23, 22);
+
+INSERT INTO Patient_Conditions (PatientID, ConditionID) VALUES
+(123, 8);
+
+INSERT INTO Billing (BillID, AdmissionID, InsuranceID, BillingAmount, PaymentStatus) VALUES
+(5113, 402, 7, 33670.13236384658, 'Paid');
+
+
+-- updates
+UPDATE Specialists
+SET ConsultationFee = 300.00
+WHERE DoctorID = (SELECT DoctorID FROM Doctors WHERE DoctorName = "Joe Dirt" AND Specialization = "psychiatry");
+
+UPDATE Billing
+SET PaymentStatus = "Overdue"
+WHERE BillID = 5113;
+
+-- applications
+INSERT INTO Patients (PatientID, PatientName, Age, Gender, BloodType)
+VALUES (124, "Will Williams", 80, "Male", "AB+");
+
+INSERT INTO Admissions (AdmissionID, PatientID, DateOfAdmission, DoctorID, HospitalID) VALUES
+(403, 124, '2022-11-19', 5, 5);
+
+INSERT INTO Patient_Conditions (PatientID, ConditionID) VALUES
+(124, 2);
+
+INSERT INTO Billing (BillID, AdmissionID, InsuranceID, BillingAmount, PaymentStatus) VALUES
+(5115, 403, 2, 34570.10006567777, 'Pending');
+
+SELECT h.Hospital AS HospitalName, COUNT(a.AdmissionID) AS TotalAdmissions, COUNT(DISTINCT d.DoctorID) AS TotalDoctors
+FROM Hospitals h
+JOIN Admissions a ON h.HospitalID = a.HospitalID
+LEFT JOIN Doctors d ON a.DoctorID = d.DoctorID
+GROUP BY h.HospitalID, h.Hospital
+ORDER BY TotalAdmissions DESC;
+
+SELECT m.Description AS MedicalCondition, COUNT(*) AS TotalCases
+FROM Patient_Conditions pc
+JOIN Medical_Conditions m ON pc.ConditionID = m.ConditionID
+GROUP BY m.Description;
+
+SELECT strftime('%m', DateOfAdmission) AS Month, COUNT(*) AS TotalAdmissions
+FROM Admissions
+GROUP BY Month;
+
