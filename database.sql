@@ -807,36 +807,6 @@ INSERT INTO Admissions (
                            21
                        );
 
-INSERT INTO Admissions (
-                           AdmissionID,
-                           PatientID,
-                           DateOfAdmission,
-                           DoctorID,
-                           HospitalID
-                       )
-                       VALUES (
-                           402,
-                           123,
-                           '2022-11-17',
-                           23,
-                           22
-                       );
-
-INSERT INTO Admissions (
-                           AdmissionID,
-                           PatientID,
-                           DateOfAdmission,
-                           DoctorID,
-                           HospitalID
-                       )
-                       VALUES (
-                           403,
-                           124,
-                           '2022-11-19',
-                           5,
-                           5
-                       );
-
 
 -- Table: AllData
 CREATE TABLE AllData (
@@ -4573,36 +4543,6 @@ INSERT INTO Billing (
                         'Pending'
                     );
 
-INSERT INTO Billing (
-                        BillID,
-                        AdmissionID,
-                        InsuranceID,
-                        BillingAmount,
-                        PaymentStatus
-                    )
-                    VALUES (
-                        5113,
-                        402,
-                        7,
-                        33670.13236384658,
-                        'Overdue'
-                    );
-
-INSERT INTO Billing (
-                        BillID,
-                        AdmissionID,
-                        InsuranceID,
-                        BillingAmount,
-                        PaymentStatus
-                    )
-                    VALUES (
-                        5115,
-                        403,
-                        2,
-                        34570.10006567777,
-                        'Pending'
-                    );
-
 
 -- Table: Doctors
 CREATE TABLE Doctors (
@@ -4846,11 +4786,6 @@ INSERT INTO Doctors (
                         DoctorID,
                         DoctorName,
                         Specialization
-                    )
-                    VALUES (
-                        23,
-                        'Joe Dirt',
-                        'psychiatry'
                     );
 
 
@@ -5139,17 +5074,6 @@ INSERT INTO Hospitals (
                           'Fresno, CA'
                       );
 
-INSERT INTO Hospitals (
-                          HospitalID,
-                          Hospital,
-                          Location
-                      )
-                      VALUES (
-                          22,
-                          'Clovis Community',
-                          'Clovis, CA'
-                      );
-
 
 -- Table: Insurance
 CREATE TABLE Insurance (
@@ -5224,18 +5148,6 @@ INSERT INTO Insurance (
                           'Partial Coverage'
                       );
 
-INSERT INTO Insurance (
-                          InsuranceID,
-                          Insurance,
-                          CoverageDescription
-                      )
-                      VALUES (
-                          7,
-                          'Humana',
-                          'Partial Coverage'
-                      );
-
-
 -- Table: Medical_Conditions
 CREATE TABLE Medical_Conditions (
     ConditionID INT           PRIMARY KEY,
@@ -5303,15 +5215,6 @@ INSERT INTO Medical_Conditions (
                                VALUES (
                                    7,
                                    'concussion'
-                               );
-
-INSERT INTO Medical_Conditions (
-                                   ConditionID,
-                                   Description
-                               )
-                               VALUES (
-                                   8,
-                                   'depression'
                                );
 
 
@@ -5799,24 +5702,6 @@ INSERT INTO Patient_Conditions (
                                VALUES (
                                    53,
                                    7
-                               );
-
-INSERT INTO Patient_Conditions (
-                                   PatientID,
-                                   ConditionID
-                               )
-                               VALUES (
-                                   123,
-                                   8
-                               );
-
-INSERT INTO Patient_Conditions (
-                                   PatientID,
-                                   ConditionID
-                               )
-                               VALUES (
-                                   124,
-                                   2
                                );
 
 
@@ -6609,36 +6494,6 @@ INSERT INTO Patients (
                          'O-'
                      );
 
-INSERT INTO Patients (
-                         PatientID,
-                         PatientName,
-                         Age,
-                         Gender,
-                         BloodType
-                     )
-                     VALUES (
-                         123,
-                         'Ally Smith',
-                         30,
-                         'Female',
-                         'O-'
-                     );
-
-INSERT INTO Patients (
-                         PatientID,
-                         PatientName,
-                         Age,
-                         Gender,
-                         BloodType
-                     )
-                     VALUES (
-                         124,
-                         'Will Williams',
-                         80,
-                         'Male',
-                         'AB+'
-                     );
-
 
 -- Table: Specialists
 CREATE TABLE Specialists (
@@ -6836,17 +6691,6 @@ INSERT INTO Specialists (
                             22,
                             'Endocrinologist',
                             150
-                        );
-
-INSERT INTO Specialists (
-                            DoctorID,
-                            FieldOfSpecialization,
-                            ConsultationFee
-                        )
-                        VALUES (
-                            23,
-                            'Psychiatry',
-                            300
                         );
 
 
